@@ -1,0 +1,29 @@
+{
+  "name": "argc",
+  "version": "0.1.0",
+  "description": "A small library I have used for years to provide efficient and consistent run-time argument validation.  This is used during development, and can be disabled or easily removed durning the build stage prior to deployment.  This is the first node port, however, and I still need to add tests.  Use with caution! ",
+  "main": "argc.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:mmikowski/nodejs-argc.git"
+  },
+  "keywords": [
+    "validator",
+    "validate",
+    "argument",
+    "arguments",
+    "checking",
+    "debug",
+    "closure",
+    "annotations"
+  ],
+  "author": "Michael S. Mikowski <mike.mikowski@gmail.com> (http://michaelmikowski.com/)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mmikowski/nodejs-argc/issues"
+  },
+  "homepage": "https://github.com/mmikowski/nodejs-argc"
+}
