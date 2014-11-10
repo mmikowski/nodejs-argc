@@ -1,6 +1,6 @@
 /*!
  * argc - Named argument checker library for JavaScript
- * version: 0.1.0 for nodejs
+ * version: 0.1.2 for nodejs
  *
  * Michael Mikowski - mike.mikowski@gmail.com
  * This is an original work inspired by my Perl modules, checkArgs.pm
@@ -14,10 +14,7 @@
   regexp : true, sloppy  : true, vars     : false,
   white  : true
 */
-
-/*global global, exports*/
-
-argc = (function () {
+var argc = (function () {
   'use strict';
   //---------------- BEGIN MODULE SCOPE VARIABLES --------------
   var
@@ -199,7 +196,9 @@ argc = (function () {
         if ( rule_row_map.hasOwnProperty( 'max_int' )
           && data_arg > rule_row_map.max_int
         ) {
-          if ( rule_row_map.do_autofix ) { data_arg = rule_row_map.max_int; }
+          if ( rule_row_map.do_autobound ) { 
+            data_arg = rule_row_map.max_int;
+          }
           else {
             rule_msg_list.push(
               'exceeds allowed maximum of ' + rule_row_map.max_int
@@ -210,7 +209,9 @@ argc = (function () {
         if ( rule_row_map.hasOwnProperty( 'min_int' )
           && data_arg < rule_row_map.min_int
         ) {
-          if ( rule_row_map.do_autofix ) { data_arg = rule_row_map.min_int; }
+          if ( rule_row_map.do_autobound ) {
+            data_arg = rule_row_map.min_int;
+          }
           else {
             rule_msg_list.push(
               'below allowed minimum of ' + rule_row_map.min_int
@@ -239,7 +240,7 @@ argc = (function () {
         if ( rule_row_map.hasOwnProperty( 'max_num' )
           && data_arg > rule_row_map.max_num
         ) {
-          if ( rule_row_map.do_autofix ) { data_arg = rule_row_map.max_num; }
+          if ( rule_row_map.do_autobound ) { data_arg = rule_row_map.max_num; }
           else {
             rule_msg_list.push(
               'exceeds allowed maximum of ' + rule_row_map.max_num
@@ -250,7 +251,7 @@ argc = (function () {
         if ( rule_row_map.hasOwnProperty( 'min_num' )
           && data_arg < rule_row_map.min_num
         ) {
-          if ( rule_row_map.do_autofix ) { data_arg = rule_row_map.min_num; }
+          if ( rule_row_map.do_autobound ) { data_arg = rule_row_map.min_num; }
           else {
             rule_msg_list.push(
               'below allowed minimum of ' + rule_row_map.min_num
@@ -305,8 +306,11 @@ argc = (function () {
         rule_msg_list.push( 'data type ' + rule_var_type + ' is not supported' );
         break;
     }
-    // There is no explicit return value.
-    // The rule_msg_list is appended to if there are errors.
+
+    // Return the value of the argument, which may have been adjusted above.
+    // The logic appends to rule_msg_list if there are errors.
+    //
+    return data_arg; 
   };
   //------------ END NON-BROWSER UTILITY METHODS ---------------
 
@@ -428,13 +432,13 @@ argc = (function () {
   //     * integer:
   //       + min_int      - min allowed value
   //       + max_int      - max allowed value
-  //       + do_auto_fix  - auto bound input to min/max as appropriate
+  //       + do_autobound - auto bound input to min/max as appropriate
   //     * map/object:
   //       + is_empty_ok  - allow an empty object
   //     * number:
   //       + min_num      - min allowed value
   //       + max_num      - max allowed value
-  //       + do_auto_fix  - auto bound input to min/max as appropriate
+  //       + do_autobound - auto bound input to min/max as appropriate
   //     * string:
   //       + is_empty_ok  - allow empty string
   //       + filter_regex - a regex filter that must be passed
@@ -472,7 +476,7 @@ argc = (function () {
     var
       mode_key = stateMap.mode_key,
 
-      do_check_names, error_obj, error_stack,
+      do_check_names, error_obj,
       rule_key, rule_row_map, rule_msg_list,
       data_arg, real_var_type, rule_var_type,
       regex_name, msg_list, unseen_map
@@ -580,7 +584,9 @@ argc = (function () {
           && data_arg
           && rule_row_map.is_optional !== true
         ) {
-          checkArg(
+         
+          // The check may mutate the value, so we set it here
+          arg_map[ rule_key ]= checkArg(
              rule_var_type, real_var_type, rule_msg_list, rule_row_map, data_arg
           );
         }
@@ -609,10 +615,6 @@ argc = (function () {
         }
       );
 
-      // error_stack = error_obj.hasOwnProperty( 'get_stack' )
-      //   ? error_obj.get_stack()
-      //   : 'No Stack'
-      //   ;
       console.error( error_obj );
       throw error_obj;
     }
